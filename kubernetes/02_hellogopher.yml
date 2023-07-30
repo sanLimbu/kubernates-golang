@@ -14,8 +14,25 @@ spec: # what state you desire for the object
     spec:
       containers:
       - name: hellogopher # Name of the Container
-        image: santosh/hellogopher:1.0 # Important, to not use latest tag as it will try DOckerhub then
+        image: santosh/hellogopher:5.0 # Important, to not use latest tag as it will try DOckerhub then
         imagePullPolicy: IfNotPresent # Will only pull from DockerHub if not present already in Local docker
+        envFrom:
+        - configMapRef:
+            name: database-configs # just specify your configmap name
+        env:
+        - name: DATABASE_PASSWORD
+          valueFrom: 
+            secretKeyRef: # This is used to fetch value from secret, should be base64 encoded
+              name: database-secrets # Name of our secrets object
+              key: DATABASE_PASSWORD # The secret key to fetch value from
+        resources: # Here we start the Resource section 
+          requests: # Requests are the minimum available resources a Node needs to be accepted as a valid node
+            memory: "1Mi"
+            cpu: "50m"
+          limits: # Limits is the maximum amount of resource the pods are allowed to use
+            memory: "10Mi"
+            cpu: "100m" # 0.1 Is not allowed, instead we use 100m which is the same
+      
         ports: # Ports to Expose
         - containerPort: 8080  
         readinessProbe:

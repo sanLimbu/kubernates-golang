@@ -10,6 +10,14 @@ import (
 func main() {
 
 	started := time.Now()
+
+	//Connect to database, or Crash
+	if err := connectDatabase(); err != nil {
+		log.Fatal(err)
+	}
+
+	defer databaseConn.Close()
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//Calculate the runtime duration
 		duration := time.Now().Sub(started)
