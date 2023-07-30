@@ -1,0 +1,36 @@
+apiVersion: apps/v1  #Which version of the Kubernetes API you're using to create this object
+kind: Deployment #what kind of object you want to create [deployment, sevices ]
+metadata: # Data that helps to uniquely identify the object
+  name: hellogopher
+spec: # what state you desire for the object
+  selector: # 
+    matchLabels: #matchLabels is a map of {key, value} pairs
+      app: hellogopher
+  replicas: 1 #tells the deplyment to run 1 pod
+  template: #when creating new pods, this template will be used
+    metadata:
+      labels: #labels used when searching / managing deployments
+        app: hellogopher
+    spec:
+      containers:
+      - name: hellogopher # Name of the Container
+        image: santosh/hellogopher:1.0 # Important, to not use latest tag as it will try DOckerhub then
+        imagePullPolicy: IfNotPresent # Will only pull from DockerHub if not present already in Local docker
+        ports: # Ports to Expose
+        - containerPort: 8080  
+        readinessProbe:
+          initialDelaySeconds: 5 #Time before starting to proble sttus
+          timeoutSeconds: 1 #Time to wait before timeout
+          #HTTP proble
+          httpGet:
+            path: / # the path we use to proble
+            port: 8080 
+        livenessProbe:
+          initialDelaySeconds: 5 # Time before starting a Proble status
+          timeoutSeconds: 1 #TIme to wait before timeout
+          failureThreshold: 3 # How many times it can fail before restarting
+          # HTTP proble
+          httpGet:  
+            path: / #the path we use to probe
+            port: 8080
+
